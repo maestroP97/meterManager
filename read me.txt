@@ -1,0 +1,34 @@
+
+		COMMENT DEPLOYER L'APPLICATION?
+	         ----------------------------
+
+Dans le dossier d'installation d'un serveur web (WAMP, XAMP, EASY PHP, etc.)
+
+1)- ouvrir le dossier de projet (www ou htdocs)
+2)- placer le dossier meterManager dans ce dossier
+
+Si la connexion à votre serveur ne nécessite pas une configuration particulière (la connexion se fait avec les paramètres par défauts du serveur), alors rendez-vous directement au point 5
+
+3)- ouvrir le fichier  "meterManager/connection/dbconnection.php" avec un éditeur de texte
+4)- modifier le contenu des variables de connexion en suivant le modèle:
+	    $hostName ="addresse_du_serveur";
+	    $userName ="nom_d_utilisateur";
+	    $pwd ="mot_de_passe_de_connexion_au_serveur";
+	    $dbName ="meterManager";
+
+5)- ouvrir le navigateur et saisir l'url "localhost/phpMyAdmin"
+
+6)- créer une nouvelle base de données ayant pour nom "meterManager"
+
+7)- importer le script contenue dans ce dossier
+
+8)- Exécuter le script importé
+
+9)- Ouvrir un nouvel onglet et saisir l'url "localhost/meterManager" et voilà, vous êtes à la page d'acceuil de l'application
+
+10)- Un utilisateur par défaut est créé, vous pouvez donc vous connecter à l'application en cliquant sur "se connecter" et en saisissant comme nom d'utilisateur "admin" et comme mot de passe "123456"
+
+11)- il ne vous reste plus qu'à profiter de votre application.
+
+
+En cas de problème ou d'incompréhension, contacter le concepteur: aubin.tchuenkam@gmail.com +237 690 838 025

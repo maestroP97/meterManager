@@ -36,7 +36,7 @@
             font-size: large;
         }
         .navbar{
-            background: rgb(0,0,0,0.3);
+            background: rgb(0,124,247,0.5);
         }
         footer{
             background: rgb(0,0,0,0.3);
@@ -77,6 +77,10 @@
         .appliName{
             color: var(color-primary);
         }
+        .modal-header{
+            background-color: #007CF7 !important;
+            color: #fff !important;
+        }
     </style>
 </head>
 <body>
@@ -84,8 +88,8 @@
         <nav class="navbar navbar-expand-sm navbar-dark fixed-top">
             <div class="container-fluid">
                 <a class="navbar-brand" href="index.php">
-                    <img src="img/notif.jpg" alt="Meter Manager" style="width:40px;">
-                    Meter Manager
+                    <img src="img/notif.jpg" alt="APD Meter Manager" style="width:40px;">
+                    APD Meter Manager
                 </a>
 
                 <ul class="navbar-nav ml-auto">
@@ -109,9 +113,8 @@
                 <div class="carousel-item active">
                     <img src="img/3.png">
                     <div class="carousel-caption">
-                        <h2>Bienvenue sur <span class="appliName" style="color: #4484EB;">Merter Manager</span>, 
-                        votre système de </h2><h3> 
-                        gestion des compteurs</h3>
+                        <h2>BIENVENUE SUR <span class="appliName" style="color: #4484EB;">APD METER MANAGER</span> <br>
+                        votre système de gestion des compteurs</h2>
                     </div>
                 </div>
                 <!--<div class="carousel-item">
@@ -145,9 +148,7 @@
             </a>
         </div>
     </header>
-    <footer>
-        powered by aubin.tchuenkam@gmail.com (+237 672838025)
-    </footer>
+
 
     <script src="css/jquery-3.5.1.min.js"></script>
     <script src="css/popper.min.js"></script>
@@ -177,7 +178,7 @@
                             else
                             {
                                 console.log(response);
-                                alert("Ereeur de connexion, nom d'utilisateur ou mot de passe incorrect. vérifiez vos informations");
+                                alert("Erreur de connexion, nom d'utilisateur ou mot de passe incorrect. vérifiez vos informations");
                                 $("#loader").hide();
                             }
                         }

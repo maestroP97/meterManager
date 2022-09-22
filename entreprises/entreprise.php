@@ -13,7 +13,8 @@
     <title>Gestionnaire de compteurs</title>
 
     <link rel="stylesheet" href="../css/bootstrap.min.css">
-    <link rel="stylesheet" href="../css/fontawesome/css/all.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- <link rel="stylesheet" href="../css/fontawesome/css/all.css"> -->
     <link rel="stylesheet" href="../css/jquery.dataTables.min.css">
 
     <style type="text/css">
@@ -27,7 +28,7 @@
             margin: 0px;
         }
         .navbar{
-            background: rgb(0,0,0,0.3);
+            background: rgb(0,124,247,0.5);
         }
         nav a{
             color: #fff;
@@ -36,21 +37,29 @@
             /* font-family: poppins; */
         }
         .jumbotron{
-            background: rgb(233,236,239,0.7);
+            background: rgb(192,230,246,0.7);
+        }
+        .modal-header{
+            background-color: #007CF7 !important;
+            color: #fff !important;
         }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-sm navbar-dark">
         <a class="navbar-brand" href="../home.php">
-            <img src="../img/notif.jpg" alt="Meter manager" style="width:40px;">
-            Meter manager
+            <img src="../img/notif.jpg" alt="APD Meter manager" style="width:40px;">
+            APD Meter Manager
         </a>
 
         <ul class="navbar-nav ml-auto">
 
             <li class="nav-item">
-                <a class="nav-link" id="listDoc" href="../home.php">Acceuil</a>
+                <a class="nav-link" onclick="goToMap()" >Voir la carte</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" id="listDoc" href="../home.php">Compteurs</a>
             </li>
 
             <li class="nav-item dropdown">
@@ -67,7 +76,7 @@
         <div class="jumbotron">
 
             <div class="d-flex justify-content-end">
-                <button type="button" id="btnAdd" data-toggle="modal" data-target="#accountModal" class="btn btn-info">Nouvelle entreprise</button>
+                <button type="button" id="btnAdd" data-toggle="modal" data-target="#accountModal" class="btn btn-primary">Ajouter une entreprise</button>
             </div>
             <br>
             <div id="tableCompte" class="table-responsive">
@@ -90,6 +99,11 @@
             $("#btnAdd").click(function(){
                 $("#operation").val("add");
                 $("#btnSave").val("Ajouter");
+                
+                $('#nom').val("");
+                $('#localisation').val("");
+                $('#secteur').val("");
+                $('#telephone').val("");
                 document.getElementById("modalTitle").innerHTML = "Nouvelle entreprise";
             });
 
@@ -108,11 +122,8 @@
                         type: 'POST',
                         data: data,
                         success: function(rep){
-                            // alert(rep);
+                            alert(rep);
                             readData();
-                            $('#nom').val("");
-                            $('#localisation').val("");
-                            $('#telephone').val("");
                             $("#accountModal").modal('hide');
                         },
                        error: function(err){
@@ -162,8 +173,8 @@
                 success:function(data,status){
                     var dat = JSON.parse(data);
                     $('#nom').val(dat.Nom);
-                    $('#type').val(dat.Type);
-                    $('#secteur').val(dat.Secteur);
+                    $('#type').val(dat.TypeUtilisateur);
+                    $('#secteur').val(dat.AdresseMail);
                     $('#localisation').val(dat.Localisation);
                     $('#telephone').val(dat.Telephone);
                 }
@@ -184,6 +195,11 @@
                 });
             }
         }
+        function goToMap(){
+            document.cookie ="showId=0;";
+            location.href="../map.php"
+        }
+
     </script>
 </body>
 </html>
@@ -198,21 +214,22 @@
                     <button type="button" class="close text-align-right" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
+
                     <label>Type</label>
                     <select class='form-control' id='type' required>
-                        <option value='Amodiateur portuaire' selected >Amodiateur portuaire</option>
+                        <option value='Utilisateur amodiateur' selected >Utilisateur amodiateur</option>
                         <option value='Utilisateur portuaire' >Utilisateur portuaire</option>
                     </select>
-                    <label>Secteur</label>
-                    <select class='form-control' id='secteur' required>
-                        <option value='Secteur 1' selected >Secteur 1</option>
-                        <option value='Secteur 2' >Secteur 2</option>
-                        <option value='Secteur 3' >Secteur 3</option>
-                    </select>
-                    <label>Nom</label>
+
+                    <label>Raison sociale / Dénomination fonctionnelle</label>
                     <input type="text" name="nom" id="nom" class="form-control" required/>
-                    <label>Localisation</label>
+                    
+                    <label>Adresse mail</label>
+                    <input type="email" class='form-control' id='secteur' />
+                    
+                    <label>Adresse</label>
                     <input type="text" name="localisation" id="localisation" class="form-control"/>
+
                     <label>Telephone</label>
                     <input type="number" name="telephone" id="telephone" class="form-control"/>
                 </div>

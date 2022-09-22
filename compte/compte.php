@@ -27,7 +27,7 @@
             margin: 0px;
         }
         .navbar{
-            background: rgb(0,0,0,0.3);
+            background: rgb(0,124,247,0.5);
         }
         nav a{
             color: #fff;
@@ -36,15 +36,15 @@
             /* font-family: poppins; */
         }
         .jumbotron{
-            background: rgb(233,236,239,0.7);
+            background: rgb(192,230,246,0.7);
         }
     </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-sm navbar-dark">
         <a class="navbar-brand" href="../home.php">
-            <img src="../img/notif.jpg" alt="Meter manager" style="width:40px;">
-            Meter manager
+            <img src="../img/notif.jpg" alt="APD Meter manager" style="width:40px;">
+            APD Meter Manager
         </a>
 
         <ul class="navbar-nav ml-auto">

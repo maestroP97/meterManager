@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
     <link rel="stylesheet" href="css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="css/dataTables.searchHighlight.css">
 
     <!--Export table button CSS-->
     <link rel="stylesheet" href="css/buttons.dataTables.min.css">
@@ -26,20 +27,20 @@
         #alertId{
             display: none;
         }
+        .dt-button{
+            border-radius: 20%;
+        }
         body{
             background-image: url(img/3.png);
             -webkit-background-size: cover;
             background-position: center center;
             background-size: cover;
-            height: auto;
+            height: 100vh;
             padding: 0px;
             margin: 0px;
         }
         .navbar{
-            background: rgb(0,0,0,0.3);
-        }
-        .jumbotron{
-            background: rgb(233,236,239,0.7);
+            background: rgb(0,124,247,0.5);
         }
         nav a{
             color: #fff;
@@ -47,8 +48,12 @@
             font-weight: bold;
             /* font-family: poppins; */
         }
-        .dt-button{
-            border-radius: 20%;
+        .jumbotron{
+            background: rgb(192,230,246,0.7);
+        }
+        .modal-header{
+            background-color: #007CF7 !important;
+            color: #fff !important;
         }
     </style>
 </head>
@@ -56,15 +61,15 @@
 
     <nav class="navbar navbar-expand-sm navbar-dark">
         <a class="navbar-brand" href="home.php">
-            <img src="img/notif.jpg" alt="Merter Manager" style="width:40px;">
-            Meter Manager
+            <img src="img/notif.jpg" alt="APD Merter Manager" style="width:40px;">
+            APD Meter Manager
         </a>
 
         <ul class="navbar-nav ml-auto">
 
-            <!--<li class="nav-item">
-                <a class="nav-link" id="listDoc" href="#" onclick="readData('Archivé')">Entreprises</a>
-            </li> -->
+            <li class="nav-item">
+                <a class="nav-link" href="map.php" onclick="goToMap()">Voir la carte</a>
+            </li>
             <li class="nav-item">
                 <a class="nav-link" href="entreprises/Entreprise.php">Entreprises</a>
             </li>
@@ -117,6 +122,9 @@
     <script type="text/javascript"  src="css/jquery.dataTables.min.js"></script>
     <script type="text/javascript"  src="css/dataTables.buttons.min.js"></script>
 
+    <script type="text/javascript"  src="css/dataTables.searchHighlight.min.js"></script>
+    <script type="text/javascript"  src="css/jquery.highlight.js"></script>
+
 
 
     <!--Export table buttons-->
@@ -130,13 +138,13 @@
 
     <?php
         // var_dump($_FILES);
-        if(!empty($_FILES['photoCpt']) && $_FILES['photoCpt']["name"]!="")
+        if(!empty($_FILES['photo']) && $_FILES['photo']["name"]!="")
         {
-            $fichName = $_FILES["photoCpt"]["name"];
+            $fichName = $_FILES["photo"]["name"];
             $fichName = str_replace(" ","_",$fichName);
             $destination = "uploadFiles/". $fichName;
             $extension = pathinfo($fichName, PATHINFO_EXTENSION);
-            $file = $_FILES["photoCpt"]["tmp_name"];
+            $file = $_FILES["photo"]["tmp_name"];
             if(!in_array($extension,["jpg","png","jpeg","JPG","PNG","JPEG"])){
                 ?> 
                     <script>
@@ -170,6 +178,14 @@
                 $("#btnSave").val("Ajouter");
                 document.getElementById("modalTitle").innerHTML = "Ajouter un compteur";
                 var idAccount = <?= $idAccount; ?>;
+                $('#libelle').val("");
+                $('#lat').val("");
+                $('#lon').val("");
+                $('#numero').val("");
+                $('#code').val("");
+                $('#diametre').val("");
+                $('#debit').val("");
+                $('#consommation').val("");
                 $.ajax({
                     url: "compteurs/compteurController.php",
                     type:'post',
@@ -181,35 +197,36 @@
                 });
             });
 
-            $("#btnSave").click(function(){
-                var libelle = $('#libCpt').val();
-                var description = $('#desCpt').val();
-                var lat = Number.parseFloat($('#latCpt').val());
-                var lon = Number.parseFloat($('#lonCpt').val());
-                var entreprise = $('#meterEnteprise').val();
-                var numero = $('#numCpt').val();
-                var status = $('#stCpt').val();
+            $("#cptForm").on("submit",function(){
                 var photo = "";
-                if(document.getElementById("photoCpt").value) photo = document.getElementById("photoCpt").files[0].name;
-                photo = photo.replace(" ","_");
+                if(document.getElementById("photo").value){
+                    photo = document.getElementById("photo").files[0].name;
+                    photo = photo.replace(" ","_");
+                }
+
+                var libelle = $('#libelle').val();
+                var description = $('#description').val();
+                var lat = Number.parseFloat($('#lat').val());
+                var lon = Number.parseFloat($('#lon').val());
+                var entreprise = $('#entreprise').val();
+                var numero = $('#numero').val();
+                var status = $('#status').val();
+                var code = $('#code').val();
+                var secteur = $('#secteur').val();
+                var diametre = $('#diametre').val();
+                var debit = $('#debit').val();
+                var conso = $('#consommation').val();
                 var idEdit = $('#id').val();
                 var operation = $('#operation').val();
                 if (libelle!="" && lat !="" && lon!="" && entreprise!=""){
                     $.ajax({
                         url:"compteurs/compteurController.php",
-                        type: 'post',
-                        data: {operation:operation, libelle:libelle, description:description, lat:lat, lon:lon, numero:numero, status:status, photo:photo, entreprise:entreprise, idEdit:idEdit},
+                        type: 'POST',
+                        data: {operation:operation, libelle:libelle, description:description, lat:lat, lon:lon, numero:numero, status:status, photo:photo, entreprise:entreprise, code:code, secteur:secteur, diametre:diametre, debit:debit, consommation:conso, idEdit:idEdit},
+                        
                         success: function(data,status){
-                            $('#libCpt').val("");
-                            $('#latCpt').val("");
-                            $('#lonCpt').val("");
-                            $('#meterEnteprise').val("");
-                            $('#numCpt').val("");
-                            $('#stCpt').val("");
-                            document.getElementById("photoCpt").value="";
-                            $("#docModal").modal('hide');
-                            readData();
                             alert(data);
+                            readData();
                         },
                         error: function(err){
                             alert(err);
@@ -220,6 +237,7 @@
                 {
                     alert("Veuillez renseigner tous les champs obligatires");
                 }
+                alert("Operation encours, veuillez cliquez sur 'OK' pour continuer!")
             });
         });
 
@@ -243,6 +261,7 @@
                     //         'excel', 'pdf', 'print'
                     //     ]
                     // });
+                   
                     $("#tableDoc").DataTable({
                         "paging": true,
                         "processing":true,
@@ -250,8 +269,9 @@
                     });
                 }
             });
+            
         }
-
+    
         function editItem(id){
             $("#operation").val("edit");
             $("#id").val(id);
@@ -265,20 +285,25 @@
                 data: {idEditItem:idEdit},
                 success:function(data,status){
                     data = JSON.parse(data);
-                    $('#libCpt').val(data.Libelle);
-                    $('#latCpt').val(Number.parseFloat(data.Lat));
-                    $('#lonCpt').val(Number.parseFloat(data.Lon));
-                    $('#meterEnteprise').val(data.Entreprise);
-                    $('#desCpt').val(data.Description);
-                    $('#numCpt').val(data.Numero);
-                    $('#stCpt').val(data.Status);
-                    document.getElementById("photoCpt").Value= "../uploadFiles/"+data.ImagePath;
+                    $('#libelle').val(data.Libelle);
+                    $('#lat').val(Number.parseFloat(data.Lat));
+                    $('#lon').val(Number.parseFloat(data.Lon));
+                    $('#entreprise').val(data.Entreprise);
+                    $('#description').val(data.Description);
+                    $('#numero').val(data.NumeroCompteur);
+                    $('#status').val(data.Etat);
+                    $('#code').val(data.CodeCompteur);
+                    $('#secteur').val(data.Secteur);
+                    $('#diametre').val(data.DiametreNominal);
+                    $('#debit').val(data.DebitNominal);
+                    $('#consommation').val(data.ConsommationMensuelle);
+                    document.getElementById("photo").Value= "../uploadFiles/"+data.ImagePath;
                 }
             });
         }
 
         function deleteItem(id){
-            var rep = confirm("Ce compteur va être supprimer. voulez-vous continuer?");
+            var rep = confirm("Ce compteur va être supprimé définitivement. voulez-vous continuer l'opération?");
             if (rep){
                 $.ajax({
                     url: "compteurs/compteurController.php",
@@ -294,22 +319,15 @@
             }
         }
 
-        function printDoc(name){
+        function showItem(meterId){
 
-            if (name!=""){
-                var url ="uploadFiles/"+name;
-                var iframe = document.getElementById("pdf");
-                iframe.src = url;
-                // var pdfPrint = Window.frames["pdf"];
-                // pdfPrint.focus();
-                // pdfPrint.print();
-                url.printDoc();
-                
+            if (meterId!=""){
+                document.cookie ="showId="+meterId+";";
+                location.href="map.php";
             }
-            else
-            {
-                alert("Ce document n'a pas été importé");
-            }
+        }
+        function goToMap(){
+            document.cookie ="showId=0;";
         }
 
         function downloadDoc(fileName){
@@ -332,13 +350,6 @@
             {
                 alert("Ce document n'a pas été importé");
             }
-        }
-
-        function searchDocument(valu){
-            $('#tableDoc').on('search.dt', function() {
-                var value = $('#dataTables_filter').val();
-                console.log(value);
-            });
         }
 
         function AddUser(){
@@ -410,67 +421,93 @@
 
 <!-- Add and Edit form modal -->
 <div id="docModal" class="modal fade">
-    <div class="modal-dialog modal-lg">
-        <form method="post" class="was-validated" enctype="multipart/form-data">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 id="modalTitle" class="modal-title">Nouveau compteur</h4>
-                    <button type="button" class="close text-align-right" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="meterEnteprise">Entreprise</label>
-                        <?= getEnterpriseList($con);?>
-                    </div>
-                    <div class="form-group">
-                        <label for="libCpt">Libelle du compteur</label>
-                        <input type="text" class="form-control" id="libCpt">
-                    </div>
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 id="modalTitle" class="modal-title">Nouveau compteur</h4>
+                <button type="button" class="close text-align-right" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" id="cptForm" class="was-validated" enctype="multipart/form-data">
                     <div class="form-row">
                         <div class="form-group col-md-6">
-                            <label for="numCpt">Numéro</label>
-                            <input type="text" class="form-control" id="numCpt" >
+                            <label for="entreprise">Entreprise</label>
+                            <?= getEnterpriseList($con);?>
                         </div>
                         <div class="form-group col-md-6">
-                            <label for="stCpt">Remarque</label>
-                            <select class='form-control' id='stCpt' required>
-                                <option value='R.A.S' selected >R.A.S</option>
-                                <option value='Fermé' >Fermé</option>
-                                <option value='Illisible' >Illisible</option>
-                                <option value='Suspendu' >Suspendu</option>
-                                <option value='Sans compteur' >Sans compteur</option>
+                            <label for="libelle">Libelle du compteur</label>
+                            <input type="text" class="form-control" id="libelle">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label for="numero">Numéro du compteur</label>
+                            <input type="text" class="form-control" id="numero" required>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="code">Code du compteur</label>
+                            <input type="text" class="form-control" id="code" required>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="status">Etat du compteur</label>
+                            <select class='form-control' id='status' required>
+                                <option value='Bon état' selected >Bon état</option>
+                                <option value='Acceptable' >Acceptable</option>
+                                <option value='Défectueux' >Défectueux</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="secteur">Secteur</label>
+                            <select class='form-control' id='secteur' required>
+                                <option value='Secteur 1' selected >Secteur 1</option>
+                                <option value='Secteur 2' >Secteur 2</option>
+                                <option value='Secteur 3' >Secteur 3</option>
                             </select>
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="latCpt">Latitude</label>
-                            <input type="number" class="form-control" id="latCpt" step="0.0000000001" placeholder="0.0000000000" required>
+                        <div class="form-group col-md-3">
+                            <label for="lat">Latitude</label>
+                            <input type="number" class="form-control" id="lat" step="0.0000000001" placeholder="0.0000000000" required>
                         </div>
-                        <div class="form-group col-md-6">
-                            <label for="lonCpt">Longitude</label>
-                            <input type="number" class="form-control" id="lonCpt" step="0.0000000001" placeholder="0.0000000000" required>
+                        <div class="form-group col-md-3">
+                            <label for="lon">Longitude</label>
+                            <input type="number" class="form-control" id="lon" step="0.0000000001" placeholder="0.0000000000" required>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="diametre">Diamètre nominal</label>
+                            <input type="number" class="form-control" id="diametre" step="0.01" placeholder="0.00">
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="debit">Debit nominal</label>
+                            <input type="number" class="form-control" id="debit" step="0.01" placeholder="0.00">
                         </div>
                     </div>
                     <div class="form-row">
-                        <div class="form-group col-md-6">
-                            <label for="photoCpt">Importer une photo</label>
-                            <input type="file" name="photoCpt" id="photoCpt" class="form-control"/>
+                        <div class="form-group col-md-3">
+                            <label for="consommation">Consommation Mensuelle</label>
+                            <input type="number" class="form-control" id="consommation" step="0.01" placeholder="0.00">
                         </div>
-                        <div class="form-group col-md-6">
-                            <label for="desCpt">Description</label>
-                            <textarea class="form-control" id="desCpt" ></textarea>
+                        <div class="form-group col-md-4">
+                            <label for="photo">Photographie du compteur</label>
+                            <input type="file" name="photo" id="photo" class="form-control"/>
+                        </div>
+                        <div class="form-group col-md-5">
+                            <label for="description">Description</label>
+                            <textarea class="form-control" id="description" ></textarea>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <input type="hidden" name="id" id="id"/>
-                    <input type="hidden" name="operation" id="operation"/>
-                    <input name="btnSave" id="btnSave" class="btn btn-primary" value="Ajouter" />
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Fermer</button>
-                </div>
+                    <div>
+                        <input type="hidden" name="id" id="id"/>
+                        <input type="hidden" name="operation" id="operation"/>
+                        
+                        <button type="button" class="btn btn-danger cancel" data-dismiss="modal">Fermer</button>
+                        <input type="submit" name="btnSave" id="btnSave" class="btn btn-primary float-right" value="Ajouter"/>
+                    </div>
+                </form>
             </div>
-        </form>
+            
+        </div>
     </div>
 </div>
 

@@ -9,27 +9,28 @@
 
     if(isset($_POST["readData"]))
     {
-        $data ='<table class="table table-hover table-condensed table-primary" id="tableDoc">
+        $data ='<table class="table table-hover table-primary" id="tableDoc">
                     <thead class=" thead thead-danger">
                         <tr class="table-primary">
-                            <th >ID</th>
+                            <th >#</th>
                             <th >LIBELLE</th>
-                            <th>ENTREPRISE</th>
-                            <th >NUMERO</th>
-                            <th >STATUS</th>
+                            <th >ENTREPRISE</th>
+                            <th >NUMERO COMPTEUR</th>
+                            <th >CODE COMPTEUR</th>
                             <th >SECTEUR</th>
                             <th >TYPE</th>
-                            <th >DESCRIPTION</th>
+                            <th >ETAT</th>
                             <th >LATITUDE</th>
                             <th >LONGITUDE</th>
-                            <th >AJOUTE LE</th>
-                            <th >AJOUTE PAR</th>
+                            <th >DIAMETRE NOMINAL (DN)</th>
+                            <th >DEBIT NOMINAL (Q)</th>
+                            <th >CONSO. MENSUELLE</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>';
         $statut = "Archivé";
-        $docList = "SELECT d.id, d.Libelle, e.Nom, d.Numero, d.Status, e.Secteur, e.Type, d.Description, d.Lat, d.Lon, d.CreateAt, u.UserName FROM users u, compteurs d, entreprises e WHERE d.Entreprise = e.id AND d.UserId = u.id;";
+        $docList = "SELECT d.id, d.Libelle, e.Nom, d.NumeroCompteur, d.CodeCompteur, d.Secteur, e.TypeUtilisateur, d.Etat, d.Description, d.Lat, d.Lon, d.DiametreNominal, d.DebitNominal, d.ConsommationMensuelle, d.CreateAt, u.UserName FROM users u, compteurs d, entreprises e WHERE d.Entreprise = e.id AND d.UserId = u.id;";
         
         $result = mysqli_query($con, $docList);
         if(mysqli_num_rows($result)>0)
@@ -56,20 +57,21 @@
                     <td>".$doc['id']."</td>
                     <td>".$doc['Libelle']."</td>
                     <td>".$doc['Nom']."</td>
-                    <td>".$doc['Numero']."</td>
-                    <td>".$doc['Status']."</td>
+                    <td>".$doc['NumeroCompteur']."</td>
+                    <td>".$doc['CodeCompteur']."</td>
                     <td>".$doc['Secteur']."</td>
-                    <td>".$doc['Type']."</td>
-                    <td>".$doc['Description']."</td>
+                    <td>".$doc['TypeUtilisateur']."</td>
+                    <td>".$doc['Etat']."</td>
                     <td>".$doc['Lat']."</td>
                     <td>".$doc['Lon']."</td>
-                    <td>".$doc['CreateAt']."</td>
-                    <td>".$doc['UserName']."</td>
+                    <td>".$doc['DiametreNominal']."</td>
+                    <td>".$doc['DebitNominal']."</td>
+                    <td>".$doc['ConsommationMensuelle']."</td>
 
                     <td width='16%'>
-                        <i onclick='showItem(\"".$doc["id"]."\")' data-toggle='tooltip' data-placement='top' title='Afficher le compteur sur la carte' class='btn btn-secondary fa fa-eye' style='font-size:11px;'></i>
-                        <i onclick='editItem(".$doc["id"].")' data-toggle='modal' data-target='#docModal' data-toggle='tooltip' data-placement='top' title='Editer ce compteur' class='btn btn-info fa fa-pencil' style='font-size:11px;'></i>
-                        <i onclick='deleteItem(".$doc["id"].")' data-toggle='tooltip' data-placement='top' title='Supprimer le compteur' class='btn btn-danger fa fa-trash' style='font-size:11px;' ></i>
+                        <i onclick='showItem(\"".$doc["id"]."\")' data-toggle='tooltip' data-placement='top' title='Afficher le compteur sur la carte' class='btn btn-secondary fa fa-eye' style='font-size:10px;'></i>
+                        <i onclick='editItem(".$doc["id"].")' data-toggle='modal' data-target='#docModal' data-toggle='tooltip' data-placement='top' title='Editer ce compteur' class='btn btn-info fa fa-pencil' style='font-size:10px;'></i>
+                        <i onclick='deleteItem(".$doc["id"].")' data-toggle='tooltip' data-placement='top' title='Supprimer le compteur' class='btn btn-danger fa fa-trash' style='font-size:10px;' ></i>
                     </td>
                 </tr>";
             }
@@ -84,12 +86,11 @@
         $description = $con->real_escape_string($description);
 
         if($operation=="add"){
-            $cmd = "SELECT id FROM compteurs WHERE  Libelle = '$libelle' AND Entreprise = '$entreprise' AND Lat='$lat' AND Lon = '$lon'";
+            $cmd = "SELECT id FROM compteurs WHERE  Libelle = '$libelle' AND Entreprise = '$entreprise' AND Lat='$lat' AND Lon = '$lon' AND NumeroCompteur = '$numero' AND CodeCompteur = '$code'";
             $result = mysqli_query($con,$cmd);
             if(mysqli_num_rows($result)<=0)
             {
-
-                $cmd = "INSERT INTO compteurs (Libelle, Numero, Status, Entreprise, Description, Lat, Lon, ImagePath, UserId) VALUES ('$libelle','$numero','$status','$entreprise','$description','$lat','$lon','$photo','$idUser')";
+                $cmd = "INSERT INTO compteurs (Libelle, NumeroCompteur, Etat, Entreprise, Description, Lat, Lon, ImagePath, UserId, CodeCompteur, Secteur, DiametreNominal, DebitNominal, ConsommationMensuelle) VALUES ('$libelle','$numero','$status','$entreprise','$description','$lat','$lon','$photo','$idUser','$code', '$secteur', '$diametre', '$debit', '$consommation')";
                 if(mysqli_query($con,$cmd)){
                     echo "Compteur ajouté!";
                 }
@@ -107,14 +108,22 @@
         }
         elseif ($operation=="edit")     
         {
-            $cmd = "SELECT id FROM compteurs WHERE  Libelle = '$libelle' AND Entreprise = '$entreprise' AND Lat='$lat' AND Lon = '$lon' AND id<>'$idEdit'";
+            $cmd = "SELECT id FROM compteurs WHERE  Libelle = '$libelle' AND Entreprise = '$entreprise' AND Lat='$lat' AND Lon = '$lon' AND NumeroCompteur = '$numero' AND CodeCompteur = '$code' AND id<>'$idEdit'";
             $result = mysqli_query($con,$cmd);
             if(mysqli_num_rows($result)<=1)
             {
-                $cmd = "UPDATE compteurs SET Libelle = '$libelle', Entreprise = '$entreprise', Numero = '$numero', Status = '$status', Description='$description', Lat='$lat', Lon = '$lon', ImagePath='$photo' WHERE id='$idEdit'";
-                if($photo=="")$cmd = "UPDATE compteurs SET Libelle = '$libelle', Entreprise = '$entreprise', Numero = '$numero', Status = '$status', Description='$description', Lat='$lat', Lon = '$lon' WHERE id='$idEdit'";
+                $cm = "select now() as dateTime;";
+                $r = mysqli_query($con,$cm);
+                $editDate = "";
+                while($doc =  mysqli_fetch_array($r))
+                {
+                    $editDate = $doc["dateTime"];
+                }
+                
+                $cmd = "UPDATE compteurs SET Libelle = '$libelle', Entreprise = '$entreprise', NumeroCompteur = '$numero', Etat = '$status', Description='$description', Lat='$lat', Lon = '$lon', CodeCompteur='$code', Secteur='$secteur', DiametreNominal='$diametre', DebitNominal='$debit', ConsommationMensuelle='$consommation', EditAt='$editDate', EditedBy = '$idUser', ImagePath='$photo' WHERE id='$idEdit'";
+                if($photo=="")$cmd = "UPDATE compteurs SET Libelle = '$libelle', Entreprise = '$entreprise', NumeroCompteur = '$numero', Etat = '$status', Description='$description', Lat='$lat', Lon = '$lon', CodeCompteur='$code', Secteur='$secteur', DiametreNominal='$diametre', DebitNominal='$debit', ConsommationMensuelle='$consommation', EditAt='$editDate', EditedBy = '$idUser' WHERE id='$idEdit'";
                 if(mysqli_query($con,$cmd)){
-                    echo " Modification effectuée!";
+                    echo "Modification effectuée!";
                 }
                 else
                 {
@@ -155,6 +164,7 @@
     }
     else
     {
+        print("Server error");
         $rep["status"]=200;
         $rep["message"]="Invalid Request!";
     }

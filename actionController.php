@@ -1,6 +1,7 @@
 <?php 
     require "connection/dbConnection.php";
 
+
     extract($_POST);
 
     if(isset($_POST["action"]) && $_POST["action"] == "login" ){
@@ -92,7 +93,7 @@
         $cmd = "SELECT * FROM entreprises";
         $res = mysqli_query($con,$cmd);
         
-        $liste ="<select class='form-control' id='meterEnteprise' required>";
+        $liste ="<select class='form-control' id='entreprise' required>";
         if (mysqli_num_rows($res)>0){
             while($result = mysqli_fetch_array($res)){
                 $liste .="<option value='".$result['id']."' >".$result["Nom"]."</option>";
